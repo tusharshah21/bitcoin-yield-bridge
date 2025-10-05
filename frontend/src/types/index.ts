@@ -19,17 +19,19 @@ export interface StarknetProvider {
 }
 
 export interface YieldStrategy {
-  id: number;
+  id: string | number;
   name: string;
-  protocol: 'Vesu' | 'Troves';
+  protocol?: 'Vesu' | 'Troves';
   apy: number;
-  tvl: number;
-  riskLevel: 1 | 2 | 3 | 4 | 5;
-  icon: string;
+  tvl?: number;
+  riskLevel?: 1 | 2 | 3 | 4 | 5;
+  risk?: 'low' | 'medium' | 'high';
+  icon?: string;
   description: string;
-  isActive: boolean;
+  isActive?: boolean;
   minDeposit: number;
-  maxDeposit: number;
+  maxDeposit?: number;
+  token?: string;
 }
 
 export interface UserPosition {
@@ -44,22 +46,26 @@ export interface UserPosition {
 
 export interface Transaction {
   id: string;
-  type: 'deposit' | 'withdrawal' | 'bridge' | 'yield';
+  hash: string;
+  type: 'deposit' | 'withdraw' | 'yield' | 'bridge';
   amount: number;
   token: string;
-  strategy?: YieldStrategy;
+  status: 'pending' | 'completed' | 'failed';
   timestamp: number;
-  status: 'pending' | 'confirmed' | 'failed';
-  txHash?: string;
-  bridgeId?: string;
-  gasFeePaid?: number;
-  yieldEarned?: number;
+  from: string;
+  to: string;
+  fee: number;
+  gasUsed?: number;
+  blockNumber?: number;
+  confirmations?: number;
+  error?: string;
+  strategy?: YieldStrategy;
 }
 
 export interface BridgeTransaction {
   id: string;
-  fromToken: 'BTC';
-  toToken: 'USDC' | 'ETH';
+  fromToken: 'BTC' | 'USDC' | 'ETH';
+  toToken: 'BTC' | 'USDC' | 'ETH';
   amount: number;
   expectedOutput: number;
   actualOutput?: number;
@@ -96,10 +102,293 @@ export interface AppFeatures {
 }
 
 export interface AVNUPaymaster {
-  isEnabled: boolean;
-  supportedTokens: string[];
-  estimatedGasSavings: number;
-  totalGasSponsored: number;
+  estimateGas(tx: StarknetTransaction): Promise<GasEstimate>;
+  sponsorTransaction(tx: StarknetTransaction): Promise<TransactionHash>;
+  getPaymasterBalance(): Promise<number>;
+  checkPaymasterEligibility(tx: StarknetTransaction): Promise<boolean>;
+}
+
+// ==================== SPONSOR API INTERFACES ====================
+
+// 1. Xverse Wallet SDK Integration
+export interface XverseIntegration {
+  authenticateUser(): Promise<BitcoinAddress>;
+  getBalance(): Promise<BTCBalance>;
+  signTransaction(tx: BitcoinTransaction): Promise<Signature>;
+  getBitcoinPrice(): Promise<number>;
+}
+
+export interface BitcoinAddress {
+  address: string;
+  publicKey: string;
+  network: 'mainnet' | 'testnet' | 'signet';
+}
+
+export interface BTCBalance {
+  confirmed: number;
+  unconfirmed: number;
+  total: number;
+  usdValue: number;
+}
+
+export interface BitcoinTransaction {
+  inputs: Array<{
+    txid: string;
+    vout: number;
+    value: number;
+  }>;
+  outputs: Array<{
+    address: string;
+    value: number;
+  }>;
+  fee: number;
+}
+
+export interface Signature {
+  signature: string;
+  publicKey: string;
+  messageHash: string;
+}
+
+// 2. Atomiq Bridge SDK
+export interface AtomiqBridge {
+  estimateSwapFee(amount: number): Promise<FeeEstimate>;
+  bridgeBitcoinToStarknet(amount: number): Promise<BridgeTransaction>;
+  getTransactionStatus(txHash: string): Promise<TransactionStatus>;
+  supportedTokens(): Promise<Array<Token>>;
+}
+
+export interface FeeEstimate {
+  networkFee: number;
+  serviceFee: number;
+  totalFee: number;
+  estimatedTime: number;
+}
+
+export interface TransactionStatus {
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  confirmations: number;
+  requiredConfirmations: number;
+  txHash?: string;
+  blockHeight?: number;
+}
+
+export interface Token {
+  symbol: string;
+  name: string;
+  address?: string;
+  decimals: number;
+  network: string;
+}
+
+// 3. AVNU Paymaster Integration (see main interface above)
+
+export interface StarknetTransaction {
+  to: string;
+  contractAddress: string;
+  entrypoint: string;
+  calldata: any[];
+  signature?: string[];
+  value?: string;
+  gasLimit?: number;
+}
+
+export interface GasEstimate {
+  gasUsed?: number;
+  gasLimit?: number;
+  gasPrice: number;
+  totalFee?: number;
+  totalCost?: number;
+  sponsoredAmount?: number;
+  currency?: string;
+}
+
+export type TransactionHash = string;
+
+// 4. Vesu Protocol Integration
+export interface VesuIntegration {
+  getAvailableStrategies(): Promise<Array<YieldStrategy>>;
+  depositIntoStrategy(strategyId: string, amount: number): Promise<Position>;
+  getPositions(): Promise<Array<Position>>;
+  withdrawFromStrategy(positionId: string): Promise<boolean>;
+  getPerformanceData(strategyId: string): Promise<Performance>;
+}
+
+export interface Position {
+  id?: string;
+  strategyId: string;
+  asset?: string;
+  amount: number;
+  shares: number;
+  entryPrice: number;
+  timestamp: number;
+  deposited?: number;
+  borrowed?: number;
+  collateralRatio?: number;
+  liquidationPrice?: number;
+  apy?: number;
+}
+
+// 5. Troves Integration
+export interface TrovesIntegration {
+  getVaults(): Promise<Array<any>>;
+  openVault(collateralAmount: number, debtAmount: number): Promise<any>;
+  getMyVaults(): Promise<Array<any>>;
+  adjustVault(vaultId: string, collateralChange: number, debtChange: number): Promise<boolean>;
+  closeVault(vaultId: string): Promise<boolean>;
+}
+
+export interface Performance {
+  totalReturn: number;
+  dailyReturn?: number;
+  weeklyReturn?: number;
+  monthlyReturn?: number;
+  annualizedReturn?: number;
+  volatility: number;
+  sharpeRatio: number;
+  maxDrawdown?: number;
+  winRate?: number;
+}
+
+// Common interfaces for all integrations
+export interface APIResponse<T> {
+  success: boolean;
+  data: T;
+  error?: string;
+  timestamp: number;
+}
+
+export interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  ttl: number;
+}
+
+export interface RetryConfig {
+  maxRetries: number;
+  initialDelay: number;
+  maxDelay: number;
+  backoffMultiplier: number;
+}
+
+export interface RateLimitConfig {
+  requestsPerMinute: number;
+  requestsPerHour: number;
+  requestsPerDay: number;
+}
+
+export interface APIConfig {
+  baseUrl: string;
+  apiKey: string;
+  timeout: number;
+  retryConfig: RetryConfig;
+  rateLimitConfig: RateLimitConfig;
+}
+
+export interface WebSocketConfig {
+  url: string;
+  reconnectInterval: number;
+  maxReconnectAttempts: number;
+  heartbeatInterval: number;
+}
+
+export interface LogEntry {
+  level: 'debug' | 'info' | 'warn' | 'error';
+  message: string;
+  timestamp: number;
+  context?: any;
+}
+
+// Missing bridge interfaces for legacy compatibility
+export interface BridgeFeeEstimate {
+  networkFee: number;
+  serviceFee: number;
+  totalFee: number;
+  estimatedTime: number;
+}
+
+export interface BridgeUpdate {
+  bridgeId: string;
+  status: string;
+  progress: number;
+  timestamp: number;
+}
+
+// Legacy compatibility
+export interface AtomiqSDK {
+  // Bridge operations
+  estimateBridgeFee(params: {
+    amount: number;
+    fromChain: 'bitcoin' | 'starknet';
+    toChain: 'bitcoin' | 'starknet';
+    fromAddress: string;
+    toAddress: string;
+  }): Promise<BridgeFeeEstimate>;
+
+  // Lightning Network integration
+  createLightningInvoice(params: {
+    amount: number;
+    description?: string;
+    expiry?: number;
+  }): Promise<{
+    invoice: string;
+    paymentHash: string;
+    expiresAt: number;
+  }>;
+
+  // Real-time bridge status
+  subscribeToBridgeUpdates(callback: (update: BridgeUpdate) => void): void;
+  unsubscribeFromBridgeUpdates(): void;
+}
+
+export interface ContractCallResult {
+  success: boolean;
+  transactionHash: string;
+  gasUsed?: number;
+}
+
+export interface AppConfig {
+  starknet: {
+    chainId: string;
+    rpcUrl: string;
+    contractAddress: string;
+  };
+  xverse: {
+    network: 'mainnet' | 'testnet' | 'signet';
+    appName: string;
+    appIcon: string;
+    apiKey?: string;
+    baseUrl?: string;
+  };
+  atomiq: {
+    apiKey: string;
+    baseUrl: string;
+    supportedNetworks: string[];
+  };
+  avnu: {
+    paymasterAddress: string;
+    supportedTokens: string[];
+    estimatedGasSavings: number;
+    totalGasSponsored: number;
+    apiKey?: string;
+    baseUrl?: string;
+  };
+  vesu?: {
+    protocolAddress: string;
+    supportedAssets: string[];
+    currentApy: number;
+    totalLiquidity: number;
+    apiKey?: string;
+    baseUrl?: string;
+  };
+  troves?: {
+    protocolAddress: string;
+    collateralRatio: number;
+    stabilityFee: number;
+    supportedCollateral: string[];
+    apiKey?: string;
+    baseUrl?: string;
+  };
 }
 
 export interface AtomiqSDK {
@@ -212,28 +501,7 @@ export interface UseContractReturn {
   error: string | null;
 }
 
-// Configuration Types
-export interface AppConfig {
-  starknet: {
-    chainId: string;
-    rpcUrl: string;
-    contractAddress: string;
-  };
-  xverse: {
-    network: 'mainnet' | 'testnet' | 'signet';
-    appName: string;
-    appIcon: string;
-  };
-  atomiq: {
-    apiKey: string;
-    baseUrl: string;
-    supportedNetworks: string[];
-  };
-  avnu: {
-    paymasterAddress: string;
-    supportedTokens: string[];
-  };
-}
+// Configuration Types (see main AppConfig above)
 
 // Utility Types
 export type DeepPartial<T> = {

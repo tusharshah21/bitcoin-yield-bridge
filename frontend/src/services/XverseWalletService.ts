@@ -20,8 +20,8 @@ export class XverseWalletService {
 
   private initializeProvider() {
     // Check if Xverse is available
-    if (typeof (global as any).window !== 'undefined' && (global as any).window.XverseProviders?.BitcoinProvider) {
-      this.provider = (global as any).window.XverseProviders.BitcoinProvider;
+    if (typeof window !== 'undefined' && (window as any).XverseProviders?.BitcoinProvider) {
+      this.provider = (window as any).XverseProviders.BitcoinProvider;
     }
   }
 

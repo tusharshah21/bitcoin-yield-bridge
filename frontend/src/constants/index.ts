@@ -11,15 +11,37 @@ export const APP_CONFIG: AppConfig = {
     network: 'testnet',
     appName: 'BitcoinYieldBridge',
     appIcon: 'https://bitcoinyieldbridge.com/icon.png',
+    apiKey: 'xverse-demo-key',
+    baseUrl: 'https://api.xverse.app'
   },
   atomiq: {
-    apiKey: 'your-atomiq-api-key-here', // Replace with actual API key
+    apiKey: 'atomiq-demo-key', // Replace with actual API key
     baseUrl: 'https://api.atomiq.exchange',
     supportedNetworks: ['bitcoin', 'lightning', 'starknet'],
   },
   avnu: {
-    paymasterAddress: '0x...', // AVNU paymaster address
+    paymasterAddress: '0x68f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8',
     supportedTokens: ['USDC', 'ETH', 'STRK'],
+    estimatedGasSavings: 85,
+    totalGasSponsored: 125000,
+    apiKey: 'avnu-demo-key',
+    baseUrl: 'https://api.avnu.fi'
+  },
+  vesu: {
+    protocolAddress: '0xvesuprotocol456',
+    supportedAssets: ['USDC', 'ETH', 'STRK'],
+    currentApy: 8.5,
+    totalLiquidity: 2500000,
+    apiKey: 'vesu-demo-key',
+    baseUrl: 'https://api.vesu.xyz'
+  },
+  troves: {
+    protocolAddress: '0xtrovesprotocol789',
+    collateralRatio: 150,
+    stabilityFee: 0.5,
+    supportedCollateral: ['BTC', 'ETH'],
+    apiKey: 'troves-demo-key',
+    baseUrl: 'https://api.troves.so'
   },
 };
 

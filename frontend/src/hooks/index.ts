@@ -1,17 +1,14 @@
-// Custom hooks for wallet and blockchain interactions
+// Bitcoin Yield Bridge Integration Hooks
 import { useState, useEffect, useCallback } from 'react';
 import { 
-  UseWalletReturn, 
-  UseStarknetReturn, 
-  UseContractReturn, 
   XverseWallet, 
   StarknetProvider,
-  ContractCallResult,
+  Portfolio,
+  Transaction,
   YieldStrategy,
-  Transaction
+  BridgeTransaction
 } from '../types';
-import XverseWalletService from '../services/XverseWalletService';
-import StarknetService from '../services/StarknetService';
+import { bitcoinYieldBridgeService } from '../services/BitcoinYieldBridgeService';
 
 // Hook for Xverse Wallet management
 export function useXverseWallet(): UseWalletReturn {
