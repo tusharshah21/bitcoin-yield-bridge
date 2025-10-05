@@ -1,0 +1,6 @@
+<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" fill="#FF6B35" rx="180"/>
+  <circle cx="512" cy="400" r="120" fill="white"/>
+  <text x="512" y="420" text-anchor="middle" fill="#FF6B35" font-family="Arial" font-size="120" font-weight="bold">₿</text>
+  <text x="512" y="680" text-anchor="middle" fill="white" font-family="Arial" font-size="80" font-weight="bold">YieldBridge</text>
+</svg>

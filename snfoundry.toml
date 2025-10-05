@@ -1,0 +1,14 @@
+# Starknet Foundry Configuration
+
+[profile.default]
+# Fork configuration
+fork_url = "https://starknet-sepolia.public.blastapi.io/rpc/v0_7"
+fork_block_number = "latest"
+
+# Test configuration
+test_threads = 1
+exit_first = true
+
+[profile.ci]
+fork_url = "https://starknet-sepolia.public.blastapi.io/rpc/v0_7"
+fork_block_number = "latest"

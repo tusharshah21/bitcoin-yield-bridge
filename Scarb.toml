@@ -1,0 +1,26 @@
+[package]
+name = "bitcoin_yield_bridge"
+version = "0.1.0"
+edition = "2023_11"
+license = "MIT"
+description = "Bitcoin-Native DeFi Aggregator with Lightning Integration for Starknet"
+
+[[target.starknet-contract]]
+sierra = true
+casm = true
+
+[dependencies]
+starknet = ">=2.6.3"
+openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.14.0" }
+
+[dev-dependencies]
+snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.21.0" }
+assert_macros = "2.6.3"
+
+[scripts]
+test = "scarb test"
+build = "scarb build"
+fmt = "scarb fmt"
+
+[tool.fmt]
+sort-module-level-items = true

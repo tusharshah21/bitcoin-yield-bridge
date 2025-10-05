@@ -1,0 +1,53 @@
+# Scarb build artifacts
+target/
+
+# Starknet Foundry artifacts
+.snfoundry_cache/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Node.js (for frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# React Native
+frontend/.expo/
+frontend/dist/
+frontend/build/
+frontend/.expo-shared/
+
+# Cairo cache
+.cairo_cache/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Account files (keep private)
+accounts/
+keystore/
+*.json.secret
+
+# API keys and secrets
+secrets/
+.secrets

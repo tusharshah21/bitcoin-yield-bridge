@@ -1,0 +1,7 @@
+<svg width="1284" height="2778" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1284" height="2778" fill="#FF6B35"/>
+  <circle cx="642" cy="1200" r="200" fill="white"/>
+  <text x="642" y="1240" text-anchor="middle" fill="#FF6B35" font-family="Arial" font-size="200" font-weight="bold">₿</text>
+  <text x="642" y="1600" text-anchor="middle" fill="white" font-family="Arial" font-size="120" font-weight="bold">BitcoinYieldBridge</text>
+  <text x="642" y="1750" text-anchor="middle" fill="white" font-family="Arial" font-size="60">Bitcoin-Native DeFi Aggregator</text>
+</svg>
